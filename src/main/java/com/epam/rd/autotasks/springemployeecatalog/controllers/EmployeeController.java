@@ -1,6 +1,5 @@
 package com.epam.rd.autotasks.springemployeecatalog.controllers;
 
-import com.epam.rd.autotasks.springemployeecatalog.aspects.EmployeeServiceDecorator;
 import com.epam.rd.autotasks.springemployeecatalog.domain.Employee;
 import com.epam.rd.autotasks.springemployeecatalog.services.EmployeeService;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,8 @@ import java.util.NoSuchElementException;
 
 @Controller
 public class EmployeeController {
-    private final EmployeeServiceDecorator employeeServiceImpl;
-    public EmployeeController(EmployeeServiceDecorator employeeServiceImpl) {
+    private final EmployeeService employeeServiceImpl;
+    public EmployeeController(EmployeeService employeeServiceImpl) {
         this.employeeServiceImpl = employeeServiceImpl;
     }
 

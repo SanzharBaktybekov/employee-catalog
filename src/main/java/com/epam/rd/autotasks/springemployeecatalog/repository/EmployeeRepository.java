@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    Page<Employee> getEmployeesByManagerId(Long managerId, Pageable pageable);
-    Page<Employee> getEmployeesByDepartmentName(String department_id, Pageable pageable);
-    Page<Employee> getEmployeesByDepartmentId(Long department_id, Pageable pageable);
+    Page<Employee> findAllEmployeesByManagerId(Long managerId, Pageable pageable);
+    Page<Employee> findAllEmployeesByDepartmentName(String department_id, Pageable pageable);
+    Page<Employee> findAllEmployeesByDepartmentId(Long department_id, Pageable pageable);
 }

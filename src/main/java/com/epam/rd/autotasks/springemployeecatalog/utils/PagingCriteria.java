@@ -12,11 +12,6 @@ public class PagingCriteria {
     public static ConditionPresentation startConfig() {
         return new ConditionPresentation();
     }
-
-    public static Pageable from(PagingRecord pagingRecord) {
-        return PageRequest.of(pagingRecord.page, pagingRecord.size, Sort.by(pagingRecord.sort));
-    }
-
     private static Consumer<PagingRecord> of(
             Map<Predicate<PagingRecord>, Consumer<PagingRecord>> map
     ) {
