@@ -6,63 +6,91 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.Table;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Objects;
 
+@Entity
+@Table(name = "DEPARTMENT")
 public class Department {
 
-    private final Long id;
-    private final String name;
-    private final String location;
+    @Id
+    @Column(name = "ID")
+    private Long id;
 
+    @Column(name = "NAME", length = 14)
+    private String name;
+
+    @Column(name = "LOCATION", length = 13)
+    private String location;
+
+    // Getters, setters, equals, hashCode, toString methods
     @JsonCreator
     public Department(@JsonProperty("id") final Long id,
-                    @JsonProperty("name") final String name,
-                    @JsonProperty("location") final String location) {
+                      @JsonProperty("name") final String name,
+                      @JsonProperty("location") final String location) {
         this.id = id;
         this.name = name;
         this.location = location;
     }
 
+    public Department() {
+
+    }
+
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getLocation() {
         return location;
     }
 
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final Department that = (Department) o;
-        return Objects.equal(id, that.id) &&
-                Objects.equal(name, that.name) &&
-                Objects.equal(location, that.location);
+        Department that = (Department) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(location, that.location);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, name, location);
+        return Objects.hash(id, name, location);
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", id)
-                .add("name", name)
-                .add("location", location)
-                .toString();
+        return "Department{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", location='" + location + '\'' +
+                '}';
     }
-
 
     public static class Parser {
         private static ObjectMapper mapper = new ObjectMapper();
@@ -91,4 +119,5 @@ public class Department {
             }
         }
     }
+
 }

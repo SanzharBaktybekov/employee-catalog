@@ -6,23 +6,38 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 
+import javax.persistence.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Objects;
 
+@Entity
+@Table(name = "EMPLOYEE")
 public class Employee {
-    private final Long id;
-    private final FullName fullName;
-    private final Position position;
-    private final LocalDate hired;
-    private final BigDecimal salary;
-    private final Employee manager;
-    private final Department department;
+    @Id
+    @Column(name = "ID")
+    private Long id;
+    @Embedded
+    private FullName fullName;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "POSITION", length = 9)
+    private Position position;
+    @ManyToOne
+    @JoinColumn(name = "MANAGER")
+    private Employee manager;
+    @Column(name = "HIREDATE")
+    private LocalDate hired;
+
+    @Column(name = "SALARY")
+    private BigDecimal salary;
+
+    @ManyToOne
+    @JoinColumn(name = "DEPARTMENT")
+    private Department department;
 
     @JsonCreator
     public Employee(@JsonProperty("id") final Long id,
@@ -41,64 +56,108 @@ public class Employee {
         this.department = department;
     }
 
+    public Employee() {
+
+    }
+
+    public Employee(Employee other) {
+        this.id = other.id;
+        this.fullName = other.fullName;
+        this.position = other.position;
+        this.hired = other.hired;
+        this.salary = other.salary;
+        this.manager = other.manager != null ? new Employee(other.manager) : null;
+        this.department = other.department;
+    }
+
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public FullName getFullName() {
         return fullName;
     }
 
+    public void setFullName(FullName fullName) {
+        this.fullName = fullName;
+    }
+
     public Position getPosition() {
         return position;
     }
 
-    public LocalDate getHired() {
-        return hired;
-    }
-
-    public BigDecimal getSalary() {
-        return salary;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public Employee getManager() {
         return manager;
     }
 
+    public void setManager(Employee manager) {
+        this.manager = manager;
+    }
+
+
+    public LocalDate getHired() {
+        return hired;
+    }
+
+    public void setHired(LocalDate hired) {
+        this.hired = hired;
+    }
+
+    public BigDecimal getSalary() {
+        return salary;
+    }
+
+    public void setSalary(BigDecimal salary) {
+        this.salary = salary;
+    }
+
     public Department getDepartment() {
         return department;
     }
 
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final Employee employee = (Employee) o;
-        return Objects.equal(id, employee.id) &&
-                Objects.equal(fullName, employee.fullName) &&
+        Employee employee = (Employee) o;
+        return Objects.equals(id, employee.id) &&
+                Objects.equals(fullName, employee.fullName) &&
                 position == employee.position &&
-                Objects.equal(hired, employee.hired) &&
-                Objects.equal(salary, employee.salary) &&
-                Objects.equal(manager, employee.manager) &&
-                Objects.equal(department, employee.department);
+                Objects.equals(manager, employee.manager) &&
+                Objects.equals(hired, employee.hired) &&
+                Objects.equals(salary, employee.salary) &&
+                Objects.equals(department, employee.department);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, fullName, position, hired, salary, manager, department);
+        return Objects.hash(id, fullName, position, manager, hired, salary, department);
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", id)
-                .add("fullName", fullName)
-                .add("position", position)
-                .add("hired", hired)
-                .add("salary", salary)
-                .add("manager", manager)
-                .add("department", department)
-                .toString();
+        return "Employee{" +
+                "id=" + id +
+                ", fullName=" + fullName +
+                ", position=" + position +
+                ", manager=" + manager +
+                ", hireDate=" + hired +
+                ", salary=" + salary +
+                ", department=" + department +
+                '}';
     }
 
     public static class Parser {
@@ -129,4 +188,5 @@ public class Employee {
             }
         }
     }
+
 }

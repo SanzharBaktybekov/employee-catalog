@@ -5,10 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Column;
+
+@Embeddable
 public class FullName {
-    private final String firstName;
-    private final String lastName;
-    private final String middleName;
+
+    @Column(name = "FIRSTNAME", length = 10)
+    private String firstName;
+
+    @Column(name = "LASTNAME", length = 10)
+    private String lastName;
+
+    @Column(name = "MIDDLENAME", length = 10)
+    private String middleName;
 
     @JsonCreator
     public FullName(@JsonProperty("firstName") final String firstName,
@@ -17,6 +27,10 @@ public class FullName {
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
+    }
+
+    public FullName() {
+
     }
 
     public String getFirstName() {
