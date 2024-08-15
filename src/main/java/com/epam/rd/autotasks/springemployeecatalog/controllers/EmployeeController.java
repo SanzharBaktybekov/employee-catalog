@@ -1,45 +1,37 @@
 package com.epam.rd.autotasks.springemployeecatalog.controllers;
 
+import com.epam.rd.autotasks.springemployeecatalog.aspects.EmployeeServiceDecorator;
 import com.epam.rd.autotasks.springemployeecatalog.domain.Employee;
 import com.epam.rd.autotasks.springemployeecatalog.services.EmployeeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import static com.epam.rd.autotasks.springemployeecatalog.utils.PagingCriteria.PagingRecord;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Controller
 public class EmployeeController {
-    private final EmployeeService employeeService;
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    private final EmployeeServiceDecorator employeeServiceImpl;
+    public EmployeeController(EmployeeServiceDecorator employeeServiceImpl) {
+        this.employeeServiceImpl = employeeServiceImpl;
     }
 
     @GetMapping("/employees")
     @ResponseBody
-    public List<Employee> findAllEmployees(
-            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(name = "size", required = false, defaultValue = "14") int size,
-            @RequestParam(name = "sort", required = false, defaultValue = "id") String sortField
-    ) {
-        System.out.printf("page:%s, size:%s, sort:%s\n", page, size, sortField);
-        return employeeService.getEmployee(page, size, sortField);
+    public List<Employee> findAllEmployees(@ModelAttribute PagingRecord pagingRecord) {
+        return employeeServiceImpl.findAllEmployees(pagingRecord);
     }
-
 
     @GetMapping("/employees/by_manager/{mgr}")
     @ResponseBody
     public List<Employee> findAllByManagerId(
-            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(name = "size", required = false, defaultValue = "1") int size,
-            @RequestParam(name = "sort", required = false, defaultValue = "id") String sortField,
+            @ModelAttribute PagingRecord pagingRecord,
             @PathVariable Long mgr
     ) {
-        return employeeService.getEmployeesByManagerId(page, size, sortField, mgr);
+        return employeeServiceImpl.findAllEmployeesByManagerId(mgr, pagingRecord);
     }
 
     @GetMapping("/employees/{id}")
@@ -48,7 +40,7 @@ public class EmployeeController {
             @RequestParam(name = "full_chain", required = false, defaultValue = "false") boolean showFullChain
     ) {
         try {
-            Employee employee = employeeService.getEmployeeById(id, showFullChain);
+            Employee employee = employeeServiceImpl.findEmployeeById(id, showFullChain);
             return ResponseEntity.ok(employee);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -57,13 +49,17 @@ public class EmployeeController {
 
     @GetMapping("/employees/by_department/{dep}")
     public ResponseEntity<List<Employee>> getEmployeesByDepartment(
-            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(name = "size", required = false, defaultValue = "1") int size,
-            @RequestParam(name = "sort", required = false, defaultValue = "id") String sortField,
+            @ModelAttribute PagingRecord pagingRecord,
             @PathVariable String dep
     ) {
-        return ResponseEntity.ok(
-                employeeService.getEmployeesByDepartment(dep, page, size, sortField)
-        );
+        return ResponseEntity.ok(resolveByDepartment(pagingRecord, dep));
+    }
+
+    private List<Employee> resolveByDepartment(PagingRecord pagingRecord, String dep) {
+        try {
+            return employeeServiceImpl.findAllEmployeeByDepartmentId(Long.parseLong(dep), pagingRecord);
+        } catch (NumberFormatException e) {
+            return employeeServiceImpl.findAllEmployeeByDepartmentName(dep, pagingRecord);
+        }
     }
 }

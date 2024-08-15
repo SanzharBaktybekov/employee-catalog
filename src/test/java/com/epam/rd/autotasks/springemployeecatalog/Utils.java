@@ -27,6 +27,7 @@ class Utils {
     }
 
     static void testCaseRoutine(Path testCase, TestCaseRoutine routine) throws Exception {
+        System.out.println("testCase:" + testCase + "...");
         try {
             routine.doCase(testCase);
         } catch (AssertionError error) {
